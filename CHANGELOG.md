@@ -26,6 +26,8 @@
 * Changed:
   * The Mac release is now compiled on Mac OS 14 (ARM) instead of Mac OS 13 (Intel)
     because of [a change by GitHub](https://github.com/actions/runner-images/issues/13046).
+  * Updated translations.
+    (Thanks to contributors on the [Crowdin project](https://crowdin.com/project/ludusavi))
 
 ## v0.30.0 (2025-11-09)
 
