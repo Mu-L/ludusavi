@@ -28,6 +28,8 @@
 * Changed:
   * The Mac release is now compiled on Mac OS 14 (ARM) instead of Mac OS 13 (Intel)
     because of [a change by GitHub](https://github.com/actions/runner-images/issues/13046).
+  * The Flatpak release's bundled version of Rclone was updated from 1.69.1 to 1.73.2.
+    ([Contributed by Soulsuke](https://github.com/flathub/com.github.mtkennerly.ludusavi/pull/55))
   * Updated translations.
     (Thanks to contributors on the [Crowdin project](https://crowdin.com/project/ludusavi))
 
