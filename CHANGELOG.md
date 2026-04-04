@@ -1,4 +1,4 @@
-## Unreleased
+## v0.31.0 (2026-04-04)
 
 * Added:
   * Roots may now use the `<game>` placeholder,
@@ -10,6 +10,8 @@
     that you can use to access some of Ludusavi's internals.
     This is highly experimental and subject to change,
     but you're welcome to give it a try in its early stages.
+  * For users with network proxy setups that cause issues with certificate/hostname validation,
+    the config file now supports a `runtime.networkSecurity` setting.
 * Fixed:
   * Native Linux saves were not detected in some Flatpak roots.
     ([Contributed by madscientist16](https://github.com/mtkennerly/ludusavi/pull/556))

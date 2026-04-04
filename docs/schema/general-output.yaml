@@ -1,6 +1,6 @@
 ---
 $schema: "http://json-schema.org/draft-07/schema#"
-title: JsonOutput
+title: ApiOutput
 description: "General output used by commands in `--api` mode"
 type: object
 required:

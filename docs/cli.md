@@ -399,6 +399,10 @@ Options:
           Don't ask for confirmation when backing up
       --force-restore
           Don't ask for confirmation when restoring
+      --no-backup
+          Don't back up after closing the game
+      --no-restore
+          Don't restore before launching the game
       --no-force-cloud-conflict
           Even if another `--force` option has been specified, ask how to resolve any cloud conflict
           rather than ignoring it and continuing silently

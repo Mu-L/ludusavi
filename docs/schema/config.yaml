@@ -98,6 +98,7 @@ properties:
       $ref: "#/definitions/Root"
   runtime:
     default:
+      networkSecurity: safe
       threads: ~
     allOf:
       - $ref: "#/definitions/Runtime"
@@ -838,6 +839,11 @@ definitions:
   Runtime:
     type: object
     properties:
+      networkSecurity:
+        description: Control certificate and hostname validation when performing downloads.
+        default: safe
+        allOf:
+          - $ref: "#/definitions/Security"
       threads:
         description: How many threads to use for parallel scanning.
         default: ~
@@ -881,6 +887,16 @@ definitions:
             type: boolean
           url:
             type: string
+  Security:
+    oneOf:
+      - description: Enable certificate and hostname validation when performing downloads.
+        type: string
+        enum:
+          - safe
+      - description: Disable certificate and hostname validation when performing downloads.
+        type: string
+        enum:
+          - unsafe
   Sort:
     type: object
     properties:
