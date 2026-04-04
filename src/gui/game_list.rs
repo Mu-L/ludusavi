@@ -707,12 +707,24 @@ impl GameList {
         match index {
             Some(i) => {
                 if scan_info.can_report_game() {
-                    self.entries[i].scan_info = scan_info;
-                    self.entries[i].backup_info = backup_info;
-                    self.entries[i].game_layout = game_layout;
-                    self.entries[i].scanned = scanned || self.entries[i].scanned;
+                    let entry = &mut self.entries[i];
+
+                    entry.scan_info = scan_info;
+                    entry.backup_info = backup_info;
+                    entry.game_layout = game_layout;
+                    entry.scanned = scanned || entry.scanned;
+                    if let Some(editor) = entry.comment_editor.as_mut() {
+                        *editor = entry
+                            .scan_info
+                            .backup
+                            .as_ref()
+                            .and_then(|x| x.comment())
+                            .map(|x| x.as_str())
+                            .map(iced::widget::text_editor::Content::with_text)
+                            .unwrap_or_default();
+                    }
                     if self.expanded_games.contains(&game_name) {
-                        self.entries[i].refresh_tree(duplicate_detector, config, scan_kind);
+                        entry.refresh_tree(duplicate_detector, config, scan_kind);
                     }
                 } else {
                     self.entries.remove(i);

@@ -23,6 +23,8 @@
     even if it didn't create a new backup for the game.
     This now behaves like the GUI and only syncs games that are newly backed up.
   * GUI: Text can now be entered using input method editors.
+  * GUI: If the backup comment field was open while selecting a different backup for the same game,
+    then the contents of the field did not reset to match the new backup's comment.
 * Changed:
   * The Mac release is now compiled on Mac OS 14 (ARM) instead of Mac OS 13 (Intel)
     because of [a change by GitHub](https://github.com/actions/runner-images/issues/13046).
