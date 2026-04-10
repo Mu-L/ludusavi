@@ -521,7 +521,7 @@ impl Ludusavi {
 pub mod parameters {
     use super::*;
 
-    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(Clone, Debug, Default, PartialEq, Eq)]
     pub struct BackUp {
         /// Which game to process. Defaults to all games.
         pub games: Vec<String>,
@@ -544,7 +544,7 @@ pub mod parameters {
         pub skip_downgrade: bool,
     }
 
-    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(Clone, Debug, Default, PartialEq, Eq)]
     pub struct Restore {
         /// Which game to process. Defaults to all games.
         pub games: Vec<String>,
@@ -567,13 +567,13 @@ pub mod parameters {
         pub skip_downgrade: bool,
     }
 
-    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(Clone, Debug, Default, PartialEq, Eq)]
     pub struct ListBackups {
         /// Which game to list. Defaults to all games.
         pub games: Vec<String>,
     }
 
-    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(Clone, Debug, Default, PartialEq, Eq)]
     pub struct EditBackup {
         /// Which game to edit.
         pub game: String,
