@@ -3,10 +3,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use iced::{keyboard, widget::scrollable, Alignment, Length, Subscription, Task};
+use iced::{Alignment, Length, Subscription, Task, keyboard, widget::scrollable};
 
 use crate::{
-    cloud::{rclone_monitor, Rclone, Remote},
+    cloud::{Rclone, Remote, rclone_monitor},
     gui::{
         button,
         common::{
@@ -19,23 +19,23 @@ use crate::{
         shortcuts::{RootHistory, Shortcut, TextHistories, TextHistory},
         style,
         widget::{
-            id, operation::container_scroll_offset, Column, Container, Element, IcedParentExt, Progress, Row, Stack,
+            Column, Container, Element, IcedParentExt, Progress, Row, Stack, id, operation::container_scroll_offset,
         },
     },
     lang::TRANSLATOR,
     prelude::{
-        app_dir, get_threads_from_env, initialize_rayon, EditAction, Error, Finality, RedirectEditActionField,
-        Security, StrictPath, SyncDirection,
+        EditAction, Error, Finality, RedirectEditActionField, Security, StrictPath, SyncDirection, app_dir,
+        get_threads_from_env, initialize_rayon,
     },
     resource::{
+        ResourceFile, SaveableResourceFile,
         cache::{self, Cache},
         config::{self, Config, CustomGame, CustomGameKind, Root},
         manifest::Manifest,
-        ResourceFile, SaveableResourceFile,
     },
     scan::{
-        game_filter, layout::BackupLayout, prepare_backup_target, registry::RegistryItem, scan_game_for_backup,
-        BackupId, Launchers, ScanKind, SteamShortcuts, TitleFinder,
+        BackupId, Launchers, ScanKind, SteamShortcuts, TitleFinder, game_filter, layout::BackupLayout,
+        prepare_backup_target, registry::RegistryItem, scan_game_for_backup,
     },
 };
 
@@ -324,21 +324,17 @@ impl App {
                     }
                 }
 
-                if jump {
-                    if let Some(GameSelection::Single { game }) = &games {
-                        self.jump_to_game_after_scan = Some(game.clone());
-                    }
+                if jump && let Some(GameSelection::Single { game }) = &games {
+                    self.jump_to_game_after_scan = Some(game.clone());
                 }
 
                 self.operation =
                     Operation::new_backup(if preview { Finality::Preview } else { Finality::Final }, games);
                 self.operation.set_force_new_full_backups(repair);
 
-                if !preview {
-                    if let Err(e) = prepare_backup_target(&self.config.backup.path) {
-                        self.go_idle();
-                        return self.show_error(e);
-                    }
+                if !preview && let Err(e) = prepare_backup_target(&self.config.backup.path) {
+                    self.go_idle();
+                    return self.show_error(e);
                 }
 
                 Task::batch([
@@ -675,10 +671,10 @@ impl App {
 
                 for entry in &self.backup_screen.log.entries {
                     self.cache.backup.recent_games.insert(entry.scan_info.game_name.clone());
-                    if let Some(backup_info) = &entry.backup_info {
-                        if !backup_info.successful() {
-                            failed = true;
-                        }
+                    if let Some(backup_info) = &entry.backup_info
+                        && !backup_info.successful()
+                    {
+                        failed = true;
                     }
                 }
 
@@ -695,33 +691,33 @@ impl App {
                 let errors = self.operation.errors().cloned();
                 self.go_idle();
 
-                if let Some(errors) = errors {
-                    if !errors.is_empty() {
-                        return self.show_modal(Modal::Errors { errors });
-                    }
+                if let Some(errors) = errors
+                    && !errors.is_empty()
+                {
+                    return self.show_modal(Modal::Errors { errors });
                 }
 
-                if let Some(jump) = self.jump_to_game_after_scan.take() {
-                    if found_single {
-                        use crate::gui::widget::operation::container_scroll_offset;
+                if let Some(jump) = self.jump_to_game_after_scan.take()
+                    && found_single
+                {
+                    use crate::gui::widget::operation::container_scroll_offset;
 
-                        self.backup_screen.log.expand_game(
-                            &jump,
-                            &self.backup_screen.duplicate_detector,
-                            &self.config,
-                            SCAN_KIND,
-                        );
+                    self.backup_screen.log.expand_game(
+                        &jump,
+                        &self.backup_screen.duplicate_detector,
+                        &self.config,
+                        SCAN_KIND,
+                    );
 
-                        return self
-                            .switch_screen(Screen::Backup)
-                            .chain(container_scroll_offset(jump.into()).map(move |offset| match offset {
-                                Some(position) => Message::Scroll {
-                                    subject: ScrollSubject::Backup,
-                                    position,
-                                },
-                                None => Message::Ignore,
-                            }));
-                    }
+                    return self
+                        .switch_screen(Screen::Backup)
+                        .chain(container_scroll_offset(jump.into()).map(move |offset| match offset {
+                            Some(position) => Message::Scroll {
+                                subject: ScrollSubject::Backup,
+                                position,
+                            },
+                            None => Message::Ignore,
+                        }));
                 }
 
                 Task::none()
@@ -1005,10 +1001,10 @@ impl App {
                         .restore
                         .recent_games
                         .insert(entry.scan_info.game_name.clone());
-                    if let Some(backup_info) = &entry.backup_info {
-                        if !backup_info.successful() {
-                            failed = true;
-                        }
+                    if let Some(backup_info) = &entry.backup_info
+                        && !backup_info.successful()
+                    {
+                        failed = true;
                     }
                 }
 
@@ -1021,10 +1017,10 @@ impl App {
                 let errors = self.operation.errors().cloned();
                 self.go_idle();
 
-                if let Some(errors) = errors {
-                    if !errors.is_empty() {
-                        return self.show_modal(Modal::Errors { errors });
-                    }
+                if let Some(errors) = errors
+                    && !errors.is_empty()
+                {
+                    return self.show_modal(Modal::Errors { errors });
                 }
 
                 Task::none()
@@ -1125,10 +1121,8 @@ impl App {
                 log::trace!("step {} / {}: {}", self.progress.current, self.progress.max, &game);
                 self.operation.remove_active_game(&game);
 
-                if !valid {
-                    if let Operation::ValidateBackups { faulty_games, .. } = &mut self.operation {
-                        faulty_games.insert(game);
-                    }
+                if !valid && let Operation::ValidateBackups { faulty_games, .. } = &mut self.operation {
+                    faulty_games.insert(game);
                 }
 
                 match self.operation_steps.pop() {
@@ -1189,10 +1183,10 @@ impl App {
             .swap(true, std::sync::atomic::Ordering::Relaxed);
         self.operation_steps.clear();
         self.operation.flag_cancel();
-        if self.operation.is_cloud_active() {
-            if let Some(sender) = self.rclone_monitor_sender.as_mut() {
-                let _ = sender.try_send(rclone_monitor::Input::Cancel);
-            }
+        if self.operation.is_cloud_active()
+            && let Some(sender) = self.rclone_monitor_sender.as_mut()
+        {
+            let _ = sender.try_send(rclone_monitor::Input::Cancel);
         }
         Task::none()
     }
@@ -1510,10 +1504,10 @@ impl App {
                 Task::none()
             }
             Message::PruneNotifications => {
-                if let Some(notification) = &self.timed_notification {
-                    if notification.expired() {
-                        self.timed_notification = None;
-                    }
+                if let Some(notification) = &self.timed_notification
+                    && notification.expired()
+                {
+                    self.timed_notification = None;
                 }
                 Task::none()
             }
@@ -1985,9 +1979,7 @@ impl App {
                     }
                     config::Event::SortCustomGames => {
                         self.config.custom_games.sort_by(|x, y| x.name.cmp(&y.name));
-                        self.text_histories
-                            .custom_games
-                            .sort_by(|x, y| x.name.current().cmp(&y.name.current()));
+                        self.text_histories.custom_games.sort_by_key(|x| x.name.current());
                     }
                     config::Event::OnlyConstructiveBackups(value) => {
                         self.config.backup.only_constructive = value;
@@ -2151,19 +2143,19 @@ impl App {
                 match self.screen {
                     Screen::Backup => {
                         for entry in &mut self.backup_screen.log.entries {
-                            if entry.scan_info.game_name == name {
-                                if let Some(tree) = entry.tree.as_mut() {
-                                    tree.expand_or_collapse_keys(&keys);
-                                }
+                            if entry.scan_info.game_name == name
+                                && let Some(tree) = entry.tree.as_mut()
+                            {
+                                tree.expand_or_collapse_keys(&keys);
                             }
                         }
                     }
                     Screen::Restore => {
                         for entry in &mut self.restore_screen.log.entries {
-                            if entry.scan_info.game_name == name {
-                                if let Some(tree) = entry.tree.as_mut() {
-                                    tree.expand_or_collapse_keys(&keys);
-                                }
+                            if entry.scan_info.game_name == name
+                                && let Some(tree) = entry.tree.as_mut()
+                            {
+                                tree.expand_or_collapse_keys(&keys);
                             }
                         }
                     }
@@ -2889,11 +2881,11 @@ impl App {
                 #[cfg(windows)]
                 {
                     use windows::{
-                        core::s,
                         Win32::UI::{
-                            Shell::{ShellExecuteExA, SHELLEXECUTEINFOA},
+                            Shell::{SHELLEXECUTEINFOA, ShellExecuteExA},
                             WindowsAndMessaging::{SW_HIDE, SW_SHOWNORMAL},
                         },
+                        core::s,
                     };
 
                     let mut system = sysinfo::System::new_all();

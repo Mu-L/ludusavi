@@ -1,11 +1,11 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    prelude::{StrictPath, ENV_DEBUG},
+    prelude::{ENV_DEBUG, StrictPath},
     resource::{config::root, manifest::Os},
     scan::{
-        launchers::{heroic::find_prefix, LauncherGame},
         TitleFinder,
+        launchers::{LauncherGame, heroic::find_prefix},
     },
 };
 
@@ -98,8 +98,8 @@ mod tests {
     use super::*;
     use crate::{
         resource::{
-            manifest::{Manifest, Os},
             ResourceFile,
+            manifest::{Manifest, Os},
         },
         testing::repo,
     };

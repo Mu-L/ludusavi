@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::{
     prelude::StrictPath,
-    scan::{registry::RegistryItem, ScanChange, ScanInfo, ScannedFile},
+    scan::{ScanChange, ScanInfo, ScannedFile, registry::RegistryItem},
 };
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -122,10 +122,10 @@ impl DuplicateDetector {
 
         for (scan_key, item) in &scan_info.found_registry_keys {
             let path = scan_key.clone();
-            if let Some(existing) = self.registry.get(&path).map(|x| x.keys()) {
-                if existing.len() == 1 {
-                    stale.extend(existing.cloned());
-                }
+            if let Some(existing) = self.registry.get(&path).map(|x| x.keys())
+                && existing.len() == 1
+            {
+                stale.extend(existing.cloned());
             }
             self.registry.entry(path.clone()).or_default().insert(
                 scan_info.game_name.clone(),

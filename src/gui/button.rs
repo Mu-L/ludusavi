@@ -1,4 +1,4 @@
-use iced::{alignment, keyboard, Length};
+use iced::{Length, alignment, keyboard};
 
 use crate::{
     gui::{
@@ -7,7 +7,7 @@ use crate::{
         },
         icon::Icon,
         style,
-        widget::{text, Button, Container, Element, Row, Text, Tooltip},
+        widget::{Button, Container, Element, Row, Text, Tooltip, text},
     },
     lang::TRANSLATOR,
     prelude::{EditAction, Finality, SyncDirection},

@@ -8,8 +8,8 @@ use crate::{
     prelude::StrictPath,
     resource::manifest::Os,
     scan::{
-        compare_ranked_titles_ref, layout::Backup, registry, BackupError, BackupInfo, DuplicateDetector,
-        OperationStatus, OperationStepDecision, ScanChange, ScanInfo, TitleMatch,
+        BackupError, BackupInfo, DuplicateDetector, OperationStatus, OperationStepDecision, ScanChange, ScanInfo,
+        TitleMatch, compare_ranked_titles_ref, layout::Backup, registry,
     },
 };
 

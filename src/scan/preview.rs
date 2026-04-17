@@ -4,9 +4,9 @@ use crate::{
     path::StrictPath,
     resource::config::{ToggledPaths, ToggledRegistry},
     scan::{
+        BackupInfo, ScanChange, ScanChangeCount, ScanKind, ScannedFile, ScannedRegistry,
         layout::Backup,
         registry::{self, RegistryItem},
-        BackupInfo, ScanChange, ScanChangeCount, ScanKind, ScannedFile, ScannedRegistry,
     },
 };
 

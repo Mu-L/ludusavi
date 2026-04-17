@@ -2,11 +2,11 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use crate::{
     lang::Language,
-    prelude::{app_dir, CANONICAL_VERSION},
+    prelude::{CANONICAL_VERSION, app_dir},
     resource::{
+        ResourceFile, SaveableResourceFile,
         config::{self, Config, Root},
         manifest::ManifestUpdate,
-        ResourceFile, SaveableResourceFile,
     },
 };
 

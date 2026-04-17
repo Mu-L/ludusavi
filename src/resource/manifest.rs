@@ -2,11 +2,11 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use crate::{
     lang::TRANSLATOR,
-    prelude::{app_dir, get_reqwest_blocking_client, Error, Security, StrictPath},
+    prelude::{Error, Security, StrictPath, app_dir, get_reqwest_blocking_client},
     resource::{
+        ResourceFile, SaveableResourceFile,
         cache::{self, Cache},
         config::{Config, CustomGame, ManifestConfig},
-        ResourceFile, SaveableResourceFile,
     },
     scan::layout::escape_folder_name,
 };
@@ -509,10 +509,10 @@ impl Manifest {
             .get(url)
             .header(reqwest::header::USER_AGENT, &*crate::prelude::USER_AGENT);
         let old_etag = cache.get(url).and_then(|x| x.etag.clone());
-        if let Some(etag) = old_etag.as_ref() {
-            if path.exists() {
-                req = req.header(reqwest::header::IF_NONE_MATCH, etag);
-            }
+        if let Some(etag) = old_etag.as_ref()
+            && path.exists()
+        {
+            req = req.header(reqwest::header::IF_NONE_MATCH, etag);
         }
         let mut res = req.send().map_err(|e| {
             log::error!(

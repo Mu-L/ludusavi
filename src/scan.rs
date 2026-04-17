@@ -26,15 +26,15 @@ pub use self::{
     preview::ScanInfo,
     saves::{ScannedFile, ScannedRegistry, ScannedRegistryValue, ScannedRegistryValues},
     steam::{SteamShortcut, SteamShortcuts},
-    title::{compare_ranked_titles, compare_ranked_titles_ref, TitleFinder, TitleMatch, TitleQuery},
+    title::{TitleFinder, TitleMatch, TitleQuery, compare_ranked_titles, compare_ranked_titles_ref},
 };
 
 use crate::{
     path::{CommonPath, StrictPath},
-    prelude::{filter_map_walkdir, Error, SKIP},
+    prelude::{Error, SKIP, filter_map_walkdir},
     resource::{
         config::{
-            root, BackupFilter, Config, RedirectConfig, RedirectKind, Root, SortKey, ToggledPaths, ToggledRegistry,
+            BackupFilter, Config, RedirectConfig, RedirectKind, Root, SortKey, ToggledPaths, ToggledRegistry, root,
         },
         manifest::{Game, GameFileEntry, IdSet, Os, Store},
     },
@@ -172,36 +172,38 @@ pub fn parse_paths(
     let public_dir = CommonPath::Public.get_globbable().unwrap_or(SKIP);
     let saved_games_dir = CommonPath::SavedGames.get_globbable();
 
-    add_path!(path
-        .replace(p::ROOT, &root_globbable)
-        .replace(p::GAME, &install_dir)
-        .replace(p::BASE, &full_install_dir)
-        .replace(p::HOME, home)
-        .replace(p::STORE_USER_ID, "*")
-        .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
-        .replace(p::WIN_APP_DATA, check_windows_path(data_dir))
-        .replace(p::WIN_LOCAL_APP_DATA, check_windows_path(data_local_dir))
-        .replace(p::WIN_LOCAL_APP_DATA_LOW, check_windows_path(data_local_low_dir))
-        .replace(p::WIN_DOCUMENTS, check_windows_path(document_dir))
-        .replace(p::WIN_PUBLIC, check_windows_path(public_dir))
-        .replace(p::WIN_PROGRAM_DATA, check_windows_path("C:/ProgramData"))
-        .replace(p::WIN_DIR, check_windows_path("C:/Windows"))
-        .replace(p::XDG_DATA, check_nonwindows_path(data_dir))
-        .replace(p::XDG_CONFIG, check_nonwindows_path(config_dir)));
+    add_path!(
+        path.replace(p::ROOT, &root_globbable)
+            .replace(p::GAME, &install_dir)
+            .replace(p::BASE, &full_install_dir)
+            .replace(p::HOME, home)
+            .replace(p::STORE_USER_ID, "*")
+            .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+            .replace(p::WIN_APP_DATA, check_windows_path(data_dir))
+            .replace(p::WIN_LOCAL_APP_DATA, check_windows_path(data_local_dir))
+            .replace(p::WIN_LOCAL_APP_DATA_LOW, check_windows_path(data_local_low_dir))
+            .replace(p::WIN_DOCUMENTS, check_windows_path(document_dir))
+            .replace(p::WIN_PUBLIC, check_windows_path(public_dir))
+            .replace(p::WIN_PROGRAM_DATA, check_windows_path("C:/ProgramData"))
+            .replace(p::WIN_DIR, check_windows_path("C:/Windows"))
+            .replace(p::XDG_DATA, check_nonwindows_path(data_dir))
+            .replace(p::XDG_CONFIG, check_nonwindows_path(config_dir))
+    );
 
     match root.store() {
         Store::Gog => {
             if Os::HOST == Os::Linux {
-                add_path!(path
-                    .replace(p::GAME, &format!("{install_dir}/game"))
-                    .replace(p::BASE, &format!("{}/{}/game", &root_globbable, install_dir)));
+                add_path!(
+                    path.replace(p::GAME, &format!("{install_dir}/game"))
+                        .replace(p::BASE, &format!("{}/{}/game", &root_globbable, install_dir))
+                );
             }
         }
         Store::Heroic => {
             if Os::HOST == Os::Linux && root_globbable.ends_with(root::Heroic::FLATPAK_SUFFIX) {
                 // Heroic is installed via Flatpak.
-                add_path!(path
-                    .replace(
+                add_path!(
+                    path.replace(
                         p::XDG_DATA,
                         check_nonwindows_path(&format!("{}/../../data", &root_globbable)),
                     )
@@ -210,7 +212,8 @@ pub fn parse_paths(
                         check_nonwindows_path(&format!("{}/../../config", &root_globbable)),
                     )
                     .replace(p::STORE_USER_ID, "*")
-                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME));
+                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                );
             }
         }
         Store::Lutris => {
@@ -219,8 +222,8 @@ pub fn parse_paths(
                     || root_globbable.ends_with(root::Lutris::FLATPAK_SUFFIX_CONFIG))
             {
                 // Lutris is installed via Flatpak.
-                add_path!(path
-                    .replace(
+                add_path!(
+                    path.replace(
                         p::XDG_DATA,
                         check_nonwindows_path(&format!("{}/../../data", &root_globbable)),
                     )
@@ -229,26 +232,27 @@ pub fn parse_paths(
                         check_nonwindows_path(&format!("{}/../../config", &root_globbable)),
                     )
                     .replace(p::STORE_USER_ID, "*")
-                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME));
+                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                );
             }
         }
         Store::Steam => {
-            if let Some(steam_shortcut) = steam_shortcut {
-                if let Some(start_dir) = &steam_shortcut.start_dir {
-                    if let Ok(start_dir) = start_dir.interpret() {
-                        add_path!(path.replace(p::BASE, &start_dir));
-                    }
-                }
+            if let Some(steam_shortcut) = steam_shortcut
+                && let Some(start_dir) = &steam_shortcut.start_dir
+                && let Ok(start_dir) = start_dir.interpret()
+            {
+                add_path!(path.replace(p::BASE, &start_dir));
             }
 
             if Os::HOST == Os::Linux {
                 if root_globbable.ends_with(root::Steam::FLATPAK_SUFFIX) {
                     // Steam is installed via Flatpak.
-                    add_path!(path
-                        .replace(p::STORE_USER_ID, "*")
-                        .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
-                        .replace(p::XDG_DATA, &format!("{}../../.local/share", &root_globbable))
-                        .replace(p::XDG_CONFIG, &format!("{}../../.config", &root_globbable)));
+                    add_path!(
+                        path.replace(p::STORE_USER_ID, "*")
+                            .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                            .replace(p::XDG_DATA, &format!("{}../../.local/share", &root_globbable))
+                            .replace(p::XDG_CONFIG, &format!("{}../../.config", &root_globbable))
+                    );
                 }
 
                 for id in ids.steam(steam_shortcut.map(|x| x.id)) {
@@ -265,54 +269,60 @@ pub fn parse_paths(
                         .replace(p::WIN_DIR, &format!("{prefix}/windows"))
                         .replace(p::XDG_DATA, check_nonwindows_path(data_dir))
                         .replace(p::XDG_CONFIG, check_nonwindows_path(config_dir));
-                    add_path_insensitive!(path2
-                        .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/steamuser/Documents"))
-                        .replace(p::WIN_APP_DATA, &format!("{prefix}/users/steamuser/AppData/Roaming"))
-                        .replace(
-                            p::WIN_LOCAL_APP_DATA,
-                            &format!("{prefix}/users/steamuser/AppData/Local")
-                        )
-                        .replace(
-                            p::WIN_LOCAL_APP_DATA_LOW,
-                            &format!("{prefix}/users/steamuser/AppData/LocalLow")
-                        ));
-                    add_path_insensitive!(path2
-                        .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/steamuser/My Documents"))
-                        .replace(p::WIN_APP_DATA, &format!("{prefix}/users/steamuser/Application Data"))
-                        .replace(
-                            p::WIN_LOCAL_APP_DATA,
-                            &format!("{prefix}/users/steamuser/Local Settings/Application Data"),
-                        ));
+                    add_path_insensitive!(
+                        path2
+                            .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/steamuser/Documents"))
+                            .replace(p::WIN_APP_DATA, &format!("{prefix}/users/steamuser/AppData/Roaming"))
+                            .replace(
+                                p::WIN_LOCAL_APP_DATA,
+                                &format!("{prefix}/users/steamuser/AppData/Local")
+                            )
+                            .replace(
+                                p::WIN_LOCAL_APP_DATA_LOW,
+                                &format!("{prefix}/users/steamuser/AppData/LocalLow")
+                            )
+                    );
+                    add_path_insensitive!(
+                        path2
+                            .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/steamuser/My Documents"))
+                            .replace(p::WIN_APP_DATA, &format!("{prefix}/users/steamuser/Application Data"))
+                            .replace(
+                                p::WIN_LOCAL_APP_DATA,
+                                &format!("{prefix}/users/steamuser/Local Settings/Application Data"),
+                            )
+                    );
 
                     if data.when.iter().any(|x| x.store == Some(Store::Uplay)) {
                         let ubisoft = format!("{prefix}/Program Files (x86)/Ubisoft/Ubisoft Game Launcher");
-                        add_path!(path
-                            .replace(p::ROOT, &ubisoft)
-                            .replace(p::GAME, &install_dir)
-                            .replace(p::BASE, &format!("{}/{}", &ubisoft, install_dir))
-                            .replace(p::STORE_USER_ID, "*")
-                            .replace(p::OS_USER_NAME, "steamuser"));
+                        add_path!(
+                            path.replace(p::ROOT, &ubisoft)
+                                .replace(p::GAME, &install_dir)
+                                .replace(p::BASE, &format!("{}/{}", &ubisoft, install_dir))
+                                .replace(p::STORE_USER_ID, "*")
+                                .replace(p::OS_USER_NAME, "steamuser")
+                        );
                     }
                 }
             }
         }
         Store::OtherHome => {
-            add_path!(path
-                .replace(p::ROOT, &root_globbable)
-                .replace(p::GAME, &install_dir)
-                .replace(p::BASE, &format!("{}/{}", &root_globbable, install_dir))
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
-                .replace(p::WIN_APP_DATA, check_windows_path("<home>/AppData/Roaming"))
-                .replace(p::WIN_LOCAL_APP_DATA, check_windows_path("<home>/AppData/Local"))
-                .replace(p::WIN_LOCAL_APP_DATA_LOW, check_windows_path("<home>/AppData/LocalLow"))
-                .replace(p::WIN_DOCUMENTS, check_windows_path("<home>/Documents"))
-                .replace(p::WIN_PUBLIC, check_windows_path(public_dir))
-                .replace(p::WIN_PROGRAM_DATA, check_windows_path("C:/ProgramData"))
-                .replace(p::WIN_DIR, check_windows_path("C:/Windows"))
-                .replace(p::XDG_DATA, check_nonwindows_path("<home>/.local/share"))
-                .replace(p::XDG_CONFIG, check_nonwindows_path("<home>/.config"))
-                .replace(p::HOME, &root_globbable));
+            add_path!(
+                path.replace(p::ROOT, &root_globbable)
+                    .replace(p::GAME, &install_dir)
+                    .replace(p::BASE, &format!("{}/{}", &root_globbable, install_dir))
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                    .replace(p::WIN_APP_DATA, check_windows_path("<home>/AppData/Roaming"))
+                    .replace(p::WIN_LOCAL_APP_DATA, check_windows_path("<home>/AppData/Local"))
+                    .replace(p::WIN_LOCAL_APP_DATA_LOW, check_windows_path("<home>/AppData/LocalLow"))
+                    .replace(p::WIN_DOCUMENTS, check_windows_path("<home>/Documents"))
+                    .replace(p::WIN_PUBLIC, check_windows_path(public_dir))
+                    .replace(p::WIN_PROGRAM_DATA, check_windows_path("C:/ProgramData"))
+                    .replace(p::WIN_DIR, check_windows_path("C:/Windows"))
+                    .replace(p::XDG_DATA, check_nonwindows_path("<home>/.local/share"))
+                    .replace(p::XDG_CONFIG, check_nonwindows_path("<home>/.config"))
+                    .replace(p::HOME, &root_globbable)
+            );
         }
         Store::OtherWine => {
             let prefix = format!("{}/drive_*", &root_globbable);
@@ -328,56 +338,63 @@ pub fn parse_paths(
                 .replace(p::WIN_DIR, &format!("{prefix}/windows"))
                 .replace(p::XDG_DATA, check_nonwindows_path(data_dir))
                 .replace(p::XDG_CONFIG, check_nonwindows_path(config_dir));
-            add_path_insensitive!(path2
-                .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/*/Documents"))
-                .replace(p::WIN_APP_DATA, &format!("{prefix}/users/*/AppData/Roaming"))
-                .replace(p::WIN_LOCAL_APP_DATA, &format!("{prefix}/users/*/AppData/Local"))
-                .replace(p::WIN_LOCAL_APP_DATA_LOW, &format!("{prefix}/users/*/AppData/LocalLow")));
-            add_path_insensitive!(path2
-                .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/*/My Documents"))
-                .replace(p::WIN_APP_DATA, &format!("{prefix}/users/*/Application Data"))
-                .replace(
-                    p::WIN_LOCAL_APP_DATA,
-                    &format!("{prefix}/users/*/Local Settings/Application Data"),
-                ));
+            add_path_insensitive!(
+                path2
+                    .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/*/Documents"))
+                    .replace(p::WIN_APP_DATA, &format!("{prefix}/users/*/AppData/Roaming"))
+                    .replace(p::WIN_LOCAL_APP_DATA, &format!("{prefix}/users/*/AppData/Local"))
+                    .replace(p::WIN_LOCAL_APP_DATA_LOW, &format!("{prefix}/users/*/AppData/LocalLow"))
+            );
+            add_path_insensitive!(
+                path2
+                    .replace(p::WIN_DOCUMENTS, &format!("{prefix}/users/*/My Documents"))
+                    .replace(p::WIN_APP_DATA, &format!("{prefix}/users/*/Application Data"))
+                    .replace(
+                        p::WIN_LOCAL_APP_DATA,
+                        &format!("{prefix}/users/*/Local Settings/Application Data"),
+                    )
+            );
         }
         Store::OtherWindows => {
-            add_path!(path
-                .replace(p::HOME, &format!("{}/Users/*", &root_globbable))
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, "*")
-                .replace(p::WIN_APP_DATA, &format!("{}/Users/*/AppData/Roaming", &root_globbable))
-                .replace(
-                    p::WIN_LOCAL_APP_DATA,
-                    &format!("{}/Users/*/AppData/Local", &root_globbable),
-                )
-                .replace(
-                    p::WIN_LOCAL_APP_DATA_LOW,
-                    &format!("{}/Users/*/AppData/LocalLow", &root_globbable),
-                )
-                .replace(p::WIN_DOCUMENTS, &format!("{}/Users/*/Documents", &root_globbable))
-                .replace(p::WIN_PUBLIC, &format!("{}/Users/Public", &root_globbable))
-                .replace(p::WIN_PROGRAM_DATA, &format!("{}/ProgramData", &root_globbable))
-                .replace(p::WIN_DIR, &format!("{}/Windows", &root_globbable)));
+            add_path!(
+                path.replace(p::HOME, &format!("{}/Users/*", &root_globbable))
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, "*")
+                    .replace(p::WIN_APP_DATA, &format!("{}/Users/*/AppData/Roaming", &root_globbable))
+                    .replace(
+                        p::WIN_LOCAL_APP_DATA,
+                        &format!("{}/Users/*/AppData/Local", &root_globbable),
+                    )
+                    .replace(
+                        p::WIN_LOCAL_APP_DATA_LOW,
+                        &format!("{}/Users/*/AppData/LocalLow", &root_globbable),
+                    )
+                    .replace(p::WIN_DOCUMENTS, &format!("{}/Users/*/Documents", &root_globbable))
+                    .replace(p::WIN_PUBLIC, &format!("{}/Users/Public", &root_globbable))
+                    .replace(p::WIN_PROGRAM_DATA, &format!("{}/ProgramData", &root_globbable))
+                    .replace(p::WIN_DIR, &format!("{}/Windows", &root_globbable))
+            );
         }
         Store::OtherLinux => {
-            add_path!(path
-                .replace(p::HOME, &format!("{}/home/*", &root_globbable))
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, "*")
-                .replace(p::XDG_DATA, &format!("{}/home/*/.local/share", &root_globbable))
-                .replace(p::XDG_CONFIG, &format!("{}/home/*/.config", &root_globbable)));
+            add_path!(
+                path.replace(p::HOME, &format!("{}/home/*", &root_globbable))
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, "*")
+                    .replace(p::XDG_DATA, &format!("{}/home/*/.local/share", &root_globbable))
+                    .replace(p::XDG_CONFIG, &format!("{}/home/*/.config", &root_globbable))
+            );
         }
         Store::OtherMac => {
-            add_path!(path
-                .replace(p::HOME, &format!("{}/Users/*", &root_globbable))
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, "*")
-                .replace(p::XDG_DATA, &format!("{}/Users/*/Library", &root_globbable))
-                .replace(
-                    p::XDG_CONFIG,
-                    &format!("{}/Users/*/Library/Preferences", &root_globbable),
-                ));
+            add_path!(
+                path.replace(p::HOME, &format!("{}/Users/*", &root_globbable))
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, "*")
+                    .replace(p::XDG_DATA, &format!("{}/Users/*/Library", &root_globbable))
+                    .replace(
+                        p::XDG_CONFIG,
+                        &format!("{}/Users/*/Library/Preferences", &root_globbable),
+                    )
+            );
         }
         Store::Ea
         | Store::Epic
@@ -392,13 +409,14 @@ pub fn parse_paths(
 
     if Os::HOST == Os::Windows {
         if let Some(saved_games_dir) = saved_games_dir {
-            add_path!(path
-                .replace(p::GAME, &install_dir)
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
-                .replace("<home>/Saved Games/", &format!("{saved_games_dir}/"))
-                .replace("<home>\\Saved Games\\", &format!("{saved_games_dir}/"))
-                .replace(p::HOME, home));
+            add_path!(
+                path.replace(p::GAME, &install_dir)
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                    .replace("<home>/Saved Games/", &format!("{saved_games_dir}/"))
+                    .replace("<home>\\Saved Games\\", &format!("{saved_games_dir}/"))
+                    .replace(p::HOME, home)
+            );
         }
 
         static VIRTUALIZED: LazyLock<Regex> = LazyLock::new(|| {
@@ -417,31 +435,34 @@ pub fn parse_paths(
     } else {
         if Os::HOST == Os::Linux {
             // Default XDG paths, in case we're in a Flatpak context.
-            add_path!(path
-                .replace(p::GAME, &install_dir)
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
-                .replace(p::XDG_DATA, "<home>/.local/share")
-                .replace(p::XDG_CONFIG, "<home>/.config")
-                .replace(p::HOME, home));
+            add_path!(
+                path.replace(p::GAME, &install_dir)
+                    .replace(p::STORE_USER_ID, "*")
+                    .replace(p::OS_USER_NAME, &crate::prelude::OS_USERNAME)
+                    .replace(p::XDG_DATA, "<home>/.local/share")
+                    .replace(p::XDG_CONFIG, "<home>/.config")
+                    .replace(p::HOME, home)
+            );
         }
 
         if let Some(flatpak_id) = ids.flatpak.as_ref() {
-            add_path!(path
-                .replace(p::HOME, home)
-                .replace(p::STORE_USER_ID, "*")
-                .replace(p::OS_USER_NAME, "*")
-                .replace(p::XDG_DATA, &format!("{home}/.var/app/{flatpak_id}/data"))
-                .replace(p::XDG_CONFIG, &format!("{home}/.var/app/{flatpak_id}/config")));
-
-            if root.store() == Store::OtherHome {
-                let home = &root_globbable;
-                add_path!(path
-                    .replace(p::HOME, home)
+            add_path!(
+                path.replace(p::HOME, home)
                     .replace(p::STORE_USER_ID, "*")
                     .replace(p::OS_USER_NAME, "*")
                     .replace(p::XDG_DATA, &format!("{home}/.var/app/{flatpak_id}/data"))
-                    .replace(p::XDG_CONFIG, &format!("{home}/.var/app/{flatpak_id}/config")));
+                    .replace(p::XDG_CONFIG, &format!("{home}/.var/app/{flatpak_id}/config"))
+            );
+
+            if root.store() == Store::OtherHome {
+                let home = &root_globbable;
+                add_path!(
+                    path.replace(p::HOME, home)
+                        .replace(p::STORE_USER_ID, "*")
+                        .replace(p::OS_USER_NAME, "*")
+                        .replace(p::XDG_DATA, &format!("{home}/.var/app/{flatpak_id}/data"))
+                        .replace(p::XDG_CONFIG, &format!("{home}/.var/app/{flatpak_id}/config"))
+                );
             }
         }
     }
@@ -967,8 +988,8 @@ mod tests {
     #[cfg(target_os = "windows")]
     use crate::resource::config::ToggledRegistryEntry;
     use crate::{
-        resource::{config::Config, manifest::Manifest, ResourceFile},
-        testing::{repo, s, EMPTY_HASH},
+        resource::{ResourceFile, config::Config, manifest::Manifest},
+        testing::{EMPTY_HASH, repo, s},
     };
 
     const ONLY_CONSTRUCTIVE: bool = false;

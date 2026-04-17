@@ -1,5 +1,5 @@
 use fuzzy_matcher::FuzzyMatcher;
-use iced::{padding, Alignment};
+use iced::{Alignment, padding};
 
 use crate::{
     gui::{
@@ -7,13 +7,13 @@ use crate::{
         common::{Message, Screen, UndoSubject},
         shortcuts::TextHistories,
         style,
-        widget::{checkbox, pick_list, text, Column, Container, Element, IcedParentExt, Row},
+        widget::{Column, Container, Element, IcedParentExt, Row, checkbox, pick_list, text},
     },
     lang::TRANSLATOR,
     resource::{config::CustomGame, manifest::Manifest},
     scan::{
-        game_filter::{self, FilterKind},
         Duplication, ScanInfo,
+        game_filter::{self, FilterKind},
     },
 };
 

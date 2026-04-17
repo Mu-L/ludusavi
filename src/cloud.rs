@@ -2,7 +2,7 @@ use std::io::{BufRead, BufReader};
 
 use crate::{
     lang::TRANSLATOR,
-    prelude::{run_command, CommandError, CommandOutput, Error, Finality, Privacy, StrictPath, SyncDirection},
+    prelude::{CommandError, CommandOutput, Error, Finality, Privacy, StrictPath, SyncDirection, run_command},
     resource::config::{App, Config},
     scan::ScanChange,
 };
@@ -558,10 +558,10 @@ impl Rclone {
 
     fn args(&self, args: &[String]) -> Vec<String> {
         let mut collected = vec![];
-        if !self.app.arguments.is_empty() {
-            if let Some(parts) = shlex::split(&self.app.arguments) {
-                collected.extend(parts);
-            }
+        if !self.app.arguments.is_empty()
+            && let Some(parts) = shlex::split(&self.app.arguments)
+        {
+            collected.extend(parts);
         }
         for arg in args {
             collected.push(arg.to_string());
@@ -681,8 +681,8 @@ impl Rclone {
 #[cfg(feature = "app")]
 pub mod rclone_monitor {
     use iced::{
-        futures::{channel::mpsc, stream, StreamExt},
         Subscription,
+        futures::{StreamExt, channel::mpsc, stream},
     };
 
     use crate::{

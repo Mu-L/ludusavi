@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashMap};
 
-use iced::{padding, Alignment};
+use iced::{Alignment, padding};
 use itertools::Itertools;
 
 use crate::{
@@ -10,7 +10,7 @@ use crate::{
         common::{Message, TreeNodeKey},
         icon::Icon,
         style,
-        widget::{checkbox, text, Button, Column, Container, IcedParentExt, Row},
+        widget::{Button, Column, Container, IcedParentExt, Row, checkbox, text},
     },
     lang::TRANSLATOR,
     path::StrictPath,
@@ -19,8 +19,8 @@ use crate::{
         manifest::Os,
     },
     scan::{
-        registry::RegistryItem, BackupError, BackupInfo, DuplicateDetector, Duplication, ScanChange, ScanInfo,
-        ScanKind, ScannedFile, ScannedRegistryValues,
+        BackupError, BackupInfo, DuplicateDetector, Duplication, ScanChange, ScanInfo, ScanKind, ScannedFile,
+        ScannedRegistryValues, registry::RegistryItem,
     },
 };
 
@@ -397,10 +397,10 @@ impl FileTreeNode {
         let mut size = 0;
         for child_node in self.nodes.values() {
             if child_node.nodes.is_empty() {
-                if let Some((_, scanned_file)) = &child_node.scanned_file {
-                    if include_ignored || !scanned_file.ignored {
-                        size += scanned_file.size;
-                    }
+                if let Some((_, scanned_file)) = &child_node.scanned_file
+                    && (include_ignored || !scanned_file.ignored)
+                {
+                    size += scanned_file.size;
                 }
             } else {
                 let child_size = child_node.calculate_directory_size(include_ignored).unwrap_or(0);
@@ -408,11 +408,7 @@ impl FileTreeNode {
             }
         }
 
-        if size == 0 {
-            None
-        } else {
-            Some(size)
-        }
+        if size == 0 { None } else { Some(size) }
     }
 }
 
@@ -520,11 +516,7 @@ impl FileTree {
                         vec![components[0].clone()],
                         FileTreeNodePath::File(StrictPath::new({
                             let tip = components[0].raw().to_string();
-                            if tip.is_empty() {
-                                "/".to_string()
-                            } else {
-                                tip
-                            }
+                            if tip.is_empty() { "/".to_string() } else { tip }
                         })),
                         FileTreeNodeType::File,
                         config,

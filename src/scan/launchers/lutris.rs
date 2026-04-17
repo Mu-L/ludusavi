@@ -89,10 +89,10 @@ impl Pending {
                 ..Default::default()
             });
         }
-        if title.is_none() {
-            if let Some(name) = self.name {
-                title = title_finder.find_one_by_normalized_name(&name);
-            }
+        if title.is_none()
+            && let Some(name) = self.name
+        {
+            title = title_finder.find_one_by_normalized_name(&name);
         }
         let title = title?;
 
@@ -255,17 +255,17 @@ fn scan_db(root: &root::Lutris) -> Result<HashMap<spec::Id, Pending>, Error> {
                     install_dir: None,
                 };
 
-                if let Some(directory) = row.directory {
-                    if !directory.trim().is_empty() {
-                        match (row.runner.as_deref(), pending.platform) {
-                            (Some("wine"), Some(Os::Windows)) => {
-                                pending.prefix = Some(StrictPath::new(directory));
-                            }
-                            (Some("linux"), _) => {
-                                pending.install_dir = Some(StrictPath::new(directory));
-                            }
-                            _ => {}
+                if let Some(directory) = row.directory
+                    && !directory.trim().is_empty()
+                {
+                    match (row.runner.as_deref(), pending.platform) {
+                        (Some("wine"), Some(Os::Windows)) => {
+                            pending.prefix = Some(StrictPath::new(directory));
                         }
+                        (Some("linux"), _) => {
+                            pending.install_dir = Some(StrictPath::new(directory));
+                        }
+                        _ => {}
                     }
                 }
 
@@ -347,7 +347,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        resource::{manifest::Manifest, ResourceFile},
+        resource::{ResourceFile, manifest::Manifest},
         testing::{absolute_path, repo},
     };
 

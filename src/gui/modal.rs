@@ -1,9 +1,8 @@
 use std::collections::BTreeSet;
 
 use iced::{
-    padding,
+    Alignment, Length, padding,
     widget::{mouse_area, opaque},
-    Alignment, Length,
 };
 use itertools::Itertools;
 
@@ -16,7 +15,7 @@ use crate::{
         icon::Icon,
         shortcuts::TextHistories,
         style,
-        widget::{pick_list, text, Column, Container, Element, IcedParentExt, Row, Space},
+        widget::{Column, Container, Element, IcedParentExt, Row, Space, pick_list, text},
     },
     lang::TRANSLATOR,
     prelude::{Error, Finality, SyncDirection},

@@ -6,16 +6,16 @@ use std::borrow::Cow;
 
 pub use iced::widget::pick_list::{Catalog, Status};
 use iced::{
+    Border, Element, Length, Padding, Rectangle, Shadow, Size, Vector,
     advanced::{
-        self, layout, overlay, renderer, text,
+        self, Clipboard, Layout, Shell, Widget, layout, overlay, renderer, text,
         widget::tree::{self, Tree},
-        Clipboard, Layout, Shell, Widget,
     },
     alignment,
     event::Event,
     mouse, touch,
     widget::overlay::menu::{self, Menu},
-    window, Border, Element, Length, Padding, Rectangle, Shadow, Size, Vector,
+    window,
 };
 
 /// A widget for selecting a single value from a list of options.

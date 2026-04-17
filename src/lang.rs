@@ -1,6 +1,6 @@
 use std::sync::{LazyLock, Mutex};
 
-use fluent::{bundle::FluentBundle, FluentArgs, FluentResource};
+use fluent::{FluentArgs, FluentResource, bundle::FluentBundle};
 use intl_memoizer::concurrent::IntlLangMemoizer;
 use itertools::Itertools;
 use regex::Regex;
@@ -12,7 +12,7 @@ use crate::{
         config::{BackupFormat, CustomGameKind, RedirectKind, Root, SortKey, Theme, ZipCompression},
         manifest::Store,
     },
-    scan::{game_filter, BackupError, OperationStatus, OperationStepDecision, ScanChange},
+    scan::{BackupError, OperationStatus, OperationStepDecision, ScanChange, game_filter},
 };
 
 const PATH: &str = "path";

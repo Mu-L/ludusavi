@@ -144,15 +144,15 @@ pub fn scan(root: &Root, manifest: &Manifest, subjects: &[String]) -> HashMap<St
         .filter_map(|name| {
             let (score, subdir) = by_title.get(name)?;
 
-            if *score < i64::MAX {
-                if let Some(competitors) = by_subdir.get(subdir) {
-                    for competitor in competitors {
-                        if let Some((competitor_score, _)) = by_title.get(competitor) {
-                            if competitor_score > score {
-                                log::debug!("[{name}] outranked by '{competitor}' for subdir '{subdir}'");
-                                return None;
-                            }
-                        }
+            if *score < i64::MAX
+                && let Some(competitors) = by_subdir.get(subdir)
+            {
+                for competitor in competitors {
+                    if let Some((competitor_score, _)) = by_title.get(competitor)
+                        && competitor_score > score
+                    {
+                        log::debug!("[{name}] outranked by '{competitor}' for subdir '{subdir}'");
+                        return None;
                     }
                 }
             }

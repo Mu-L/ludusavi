@@ -69,9 +69,5 @@ pub fn infer_game_from_heroic(roots: &[Root]) -> Option<WrapGameInfo> {
         ..Default::default()
     };
 
-    if result.is_empty() {
-        None
-    } else {
-        Some(result)
-    }
+    if result.is_empty() { None } else { Some(result) }
 }

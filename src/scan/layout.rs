@@ -15,8 +15,8 @@ use crate::{
         manifest::Os,
     },
     scan::{
-        game_file_target, prepare_backup_target, registry, BackupError, BackupId, BackupInfo, ScanChange, ScanInfo,
-        ScanKind, ScannedFile,
+        BackupError, BackupId, BackupInfo, ScanChange, ScanInfo, ScanKind, ScannedFile, game_file_target,
+        prepare_backup_target, registry,
     },
 };
 
@@ -414,10 +414,10 @@ impl IndividualMapping {
     pub fn save(&self, file: &StrictPath) {
         let new_content = serde_yaml::to_string(&self).unwrap();
 
-        if let Ok(old_content) = Self::load_raw(file) {
-            if old_content == new_content {
-                return;
-            }
+        if let Ok(old_content) = Self::load_raw(file)
+            && old_content == new_content
+        {
+            return;
         }
 
         if file.create_parent_dir().is_ok() {
@@ -1116,10 +1116,10 @@ impl GameLayout {
                     files.insert(file.clone(), None);
                 }
             }
-            if let Some(current_registry) = &registry {
-                if &full.registry == current_registry {
-                    registry = None;
-                }
+            if let Some(current_registry) = &registry
+                && &full.registry == current_registry
+            {
+                registry = None;
             }
         }
 
@@ -1618,7 +1618,7 @@ impl GameLayout {
 
         #[cfg(target_os = "windows")]
         {
-            use crate::scan::{registry, RegistryItem, ScannedRegistryValue, ScannedRegistryValues};
+            use crate::scan::{RegistryItem, ScannedRegistryValue, ScannedRegistryValues, registry};
 
             if let Some(hives) = self.registry_content(&id) {
                 for (hive_name, keys) in hives.0.iter() {
@@ -1791,12 +1791,11 @@ impl GameLayout {
 
         #[cfg(target_os = "windows")]
         {
-            if let Some(backup) = scan.backup.as_ref() {
-                if let Some(hives) = self.registry_content(&backup.id()) {
-                    if let Err(failed) = hives.restore(&scan.game_name, toggled) {
-                        failed_registry.extend(failed);
-                    }
-                }
+            if let Some(backup) = scan.backup.as_ref()
+                && let Some(hives) = self.registry_content(&backup.id())
+                && let Err(failed) = hives.restore(&scan.game_name, toggled)
+            {
+                failed_registry.extend(failed);
             }
         }
 

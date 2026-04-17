@@ -1,7 +1,7 @@
 use std::{
     num::NonZeroUsize,
     path::PathBuf,
-    sync::{atomic::AtomicBool, Arc, LazyLock, Mutex},
+    sync::{Arc, LazyLock, Mutex, atomic::AtomicBool},
 };
 
 use itertools::Itertools;

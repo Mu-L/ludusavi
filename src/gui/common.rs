@@ -1,9 +1,9 @@
 use std::collections::{BTreeSet, HashMap, HashSet};
 
-use iced::{widget::text_input, Length};
+use iced::{Length, widget::text_input};
 
 use crate::{
-    cloud::{rclone_monitor, Remote, RemoteChoice},
+    cloud::{Remote, RemoteChoice, rclone_monitor},
     gui::{
         icon::Icon,
         modal::{ModalField, ModalInputKind},
@@ -15,10 +15,9 @@ use crate::{
         manifest::{self, Manifest, ManifestUpdate},
     },
     scan::{
-        game_filter,
+        BackupInfo, Launchers, ScanInfo, ScanKind, SteamShortcuts, game_filter,
         layout::{Backup, BackupLayout, GameLayout},
         registry::RegistryItem,
-        BackupInfo, Launchers, ScanInfo, ScanKind, SteamShortcuts,
     },
 };
 

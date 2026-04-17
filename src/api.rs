@@ -4,11 +4,11 @@ use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIter
 
 use crate::{
     cloud::{CloudChange, Rclone},
-    prelude::{app_dir, Error},
+    prelude::{Error, app_dir},
     report,
     scan::{
-        layout::BackupLayout, prepare_backup_target, scan_game_for_backup, BackupId, DuplicateDetector, Launchers,
-        OperationStepDecision, ScanKind, SteamShortcuts, TitleFinder, TitleMatch,
+        BackupId, DuplicateDetector, Launchers, OperationStepDecision, ScanKind, SteamShortcuts, TitleFinder,
+        TitleMatch, layout::BackupLayout, prepare_backup_target, scan_game_for_backup,
     },
 };
 
@@ -167,7 +167,9 @@ impl Ludusavi {
                                     Finality::Final,
                                     if games_specified { &games } else { &[] },
                                 ) {
-                                    log::error!("Failed to resolve save conflict pre-backup with direction {direction:?}: {e:?}");
+                                    log::error!(
+                                        "Failed to resolve save conflict pre-backup with direction {direction:?}: {e:?}"
+                                    );
                                     should_sync_cloud_after = false;
                                     reporter.trip_cloud_sync_failed();
                                 }
@@ -347,7 +349,9 @@ impl Ludusavi {
                                     Finality::Final,
                                     if games_specified { &games } else { &[] },
                                 ) {
-                                    log::error!("Failed to resolve save conflict pre-restore with direction {direction:?}: {e:?}");
+                                    log::error!(
+                                        "Failed to resolve save conflict pre-restore with direction {direction:?}: {e:?}"
+                                    );
                                     reporter.trip_cloud_sync_failed();
                                 }
                             }
@@ -381,20 +385,19 @@ impl Ludusavi {
                 OperationStepDecision::Processed
             };
 
-            if let Some(backup) = &backup {
-                if let Some(BackupId::Named(scanned_backup)) = scan_info.backup.as_ref().map(|x| x.id()) {
-                    if backup != &scanned_backup {
-                        log::trace!("step {i} completed (backup mismatch)");
-                        let display_title = self.config.display_name(name);
-                        return Some((
-                            display_title,
-                            scan_info,
-                            Default::default(),
-                            decision,
-                            Some(Error::CliInvalidBackupId),
-                        ));
-                    }
-                }
+            if let Some(backup) = &backup
+                && let Some(BackupId::Named(scanned_backup)) = scan_info.backup.as_ref().map(|x| x.id())
+                && backup != &scanned_backup
+            {
+                log::trace!("step {i} completed (backup mismatch)");
+                let display_title = self.config.display_name(name);
+                return Some((
+                    display_title,
+                    scan_info,
+                    Default::default(),
+                    decision,
+                    Some(Error::CliInvalidBackupId),
+                ));
             }
 
             let restore_info = if scan_info.backup.is_none()

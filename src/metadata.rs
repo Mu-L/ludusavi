@@ -1,4 +1,4 @@
-use crate::prelude::{get_reqwest_blocking_client, get_reqwest_client, Security};
+use crate::prelude::{Security, get_reqwest_blocking_client, get_reqwest_client};
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
 pub struct Release {

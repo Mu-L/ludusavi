@@ -5,8 +5,8 @@ use crate::{
     prelude::Error,
     resource::config::{BackupFilter, ToggledRegistry},
     scan::{
-        registry::{Entries, Entry, Hives, RegistryItem, RegistryKind},
         BackupError, ScanChange, ScannedRegistry, ScannedRegistryValue, ScannedRegistryValues,
+        registry::{Entries, Entry, Hives, RegistryItem, RegistryKind},
     },
 };
 
@@ -239,11 +239,7 @@ impl Hives {
             }
         }
 
-        if failed.is_empty() {
-            Ok(())
-        } else {
-            Err(failed)
-        }
+        if failed.is_empty() { Ok(()) } else { Err(failed) }
     }
 
     pub fn back_up_key(
@@ -373,11 +369,7 @@ impl Hives {
             }
         }
 
-        if failed.is_empty() {
-            Ok(())
-        } else {
-            Err(failed)
-        }
+        if failed.is_empty() { Ok(()) } else { Err(failed) }
     }
 }
 

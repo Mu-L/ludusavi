@@ -1,11 +1,11 @@
-use iced::{alignment, padding, widget::tooltip, Length};
+use iced::{Length, alignment, padding, widget::tooltip};
 
 use crate::{
     gui::{
         common::Message,
         icon::Icon,
         style,
-        widget::{text, Button, Container, Tooltip},
+        widget::{Button, Container, Tooltip, text},
     },
     lang::TRANSLATOR,
     scan::ScanChange,

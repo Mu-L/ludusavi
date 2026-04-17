@@ -7,7 +7,7 @@ use crate::{
     path::StrictPath,
     prelude::Error,
     resource::{config::Config, manifest::Manifest},
-    scan::{compare_ranked_titles, layout::BackupLayout, BackupId, TitleFinder, TitleQuery},
+    scan::{BackupId, TitleFinder, TitleQuery, compare_ranked_titles, layout::BackupLayout},
 };
 
 /// The full input to the `api` command.

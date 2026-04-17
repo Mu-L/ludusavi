@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use iced::{keyboard, padding, Alignment, Length};
+use iced::{Alignment, Length, keyboard, padding};
 
 use crate::{
     cloud::{Remote, RemoteChoice},
@@ -14,7 +14,7 @@ use crate::{
         search::CustomGamesFilter,
         shortcuts::TextHistories,
         style,
-        widget::{checkbox, number_input, pick_list, text, Button, Column, Container, Element, IcedParentExt, Row},
+        widget::{Button, Column, Container, Element, IcedParentExt, Row, checkbox, number_input, pick_list, text},
     },
     lang::{Language, TRANSLATOR},
     prelude::{AVAILABLE_PARALELLISM, STEAM_DECK},

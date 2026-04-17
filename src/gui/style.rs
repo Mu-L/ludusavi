@@ -1,6 +1,6 @@
 use iced::{
-    widget::{button, checkbox, container, pick_list, scrollable, text_editor, text_input},
     Background, Border, Color, Shadow, Vector,
+    widget::{button, checkbox, container, pick_list, scrollable, text_editor, text_input},
 };
 
 use crate::{resource::config, scan::ScanChange};

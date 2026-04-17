@@ -1,7 +1,7 @@
 use std::collections::{BTreeSet, HashSet};
 
 use iced::{
-    alignment::Horizontal as HorizontalAlignment, keyboard::Modifiers, padding, widget::tooltip, Alignment, Length,
+    Alignment, Length, alignment::Horizontal as HorizontalAlignment, keyboard::Modifiers, padding, widget::tooltip,
 };
 
 use crate::{
@@ -18,8 +18,8 @@ use crate::{
         shortcuts::TextHistories,
         style,
         widget::{
-            checkbox, pick_list, text, text_editor, Button, Column, Container, IcedButtonExt, IcedParentExt, Row,
-            Tooltip,
+            Button, Column, Container, IcedButtonExt, IcedParentExt, Row, Tooltip, checkbox, pick_list, text,
+            text_editor,
         },
     },
     lang::TRANSLATOR,
@@ -29,7 +29,7 @@ use crate::{
         manifest::{self, Manifest, Os},
     },
     scan::{
-        game_filter, layout::GameLayout, BackupInfo, DuplicateDetector, OperationStatus, ScanChange, ScanInfo, ScanKind,
+        BackupInfo, DuplicateDetector, OperationStatus, ScanChange, ScanInfo, ScanKind, game_filter, layout::GameLayout,
     },
 };
 

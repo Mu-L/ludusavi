@@ -197,36 +197,33 @@ impl TitleFinder {
 
         'outer: {
             if singular {
-                if let Some(steam_id) = steam_id {
-                    if let Some(found) = self.steam_ids.get(&steam_id) {
-                        if self.eligible(found, backup, restore) {
-                            update(found.to_owned(), TitleMatch::perfect());
-                            if !multiple {
-                                break 'outer;
-                            }
-                        }
+                if let Some(steam_id) = steam_id
+                    && let Some(found) = self.steam_ids.get(&steam_id)
+                    && self.eligible(found, backup, restore)
+                {
+                    update(found.to_owned(), TitleMatch::perfect());
+                    if !multiple {
+                        break 'outer;
                     }
                 }
 
-                if let Some(gog_id) = gog_id {
-                    if let Some(found) = self.gog_ids.get(&gog_id) {
-                        if self.eligible(found, backup, restore) {
-                            update(found.to_owned(), TitleMatch::perfect());
-                            if !multiple {
-                                break 'outer;
-                            }
-                        }
+                if let Some(gog_id) = gog_id
+                    && let Some(found) = self.gog_ids.get(&gog_id)
+                    && self.eligible(found, backup, restore)
+                {
+                    update(found.to_owned(), TitleMatch::perfect());
+                    if !multiple {
+                        break 'outer;
                     }
                 }
 
-                if let Some(lutris_id) = lutris_id {
-                    if let Some(found) = self.lutris_ids.get(&lutris_id) {
-                        if self.eligible(found, backup, restore) {
-                            update(found.to_owned(), TitleMatch::perfect());
-                            if !multiple {
-                                break 'outer;
-                            }
-                        }
+                if let Some(lutris_id) = lutris_id
+                    && let Some(found) = self.lutris_ids.get(&lutris_id)
+                    && self.eligible(found, backup, restore)
+                {
+                    update(found.to_owned(), TitleMatch::perfect());
+                    if !multiple {
+                        break 'outer;
                     }
                 }
 
@@ -241,12 +238,12 @@ impl TitleFinder {
 
                 if normalized {
                     for name in &names {
-                        if let Some(found) = self.normalized.get(&normalize_title(name)) {
-                            if self.eligible(&found.canonical, backup, restore) {
-                                update(found.canonical.to_owned(), TitleMatch { score: found.score });
-                                if !multiple {
-                                    break 'outer;
-                                }
+                        if let Some(found) = self.normalized.get(&normalize_title(name))
+                            && self.eligible(&found.canonical, backup, restore)
+                        {
+                            update(found.canonical.to_owned(), TitleMatch { score: found.score });
+                            if !multiple {
+                                break 'outer;
                             }
                         }
                     }

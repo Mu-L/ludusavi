@@ -16,14 +16,14 @@ use crate::{
     cloud::{CloudChange, Rclone, Remote},
     lang::{Language, TRANSLATOR},
     prelude::{
-        app_dir, get_threads_from_env, initialize_rayon, register_sigint, unregister_sigint, Error, Finality,
-        StrictPath, SyncDirection,
+        Error, Finality, StrictPath, SyncDirection, app_dir, get_threads_from_env, initialize_rayon, register_sigint,
+        unregister_sigint,
     },
-    report::{self, report_cloud_changes, Reporter},
-    resource::{cache::Cache, config::Config, manifest::Manifest, ResourceFile, SaveableResourceFile},
+    report::{self, Reporter, report_cloud_changes},
+    resource::{ResourceFile, SaveableResourceFile, cache::Cache, config::Config, manifest::Manifest},
     scan::{
-        layout::BackupLayout, prepare_backup_target, scan_game_for_backup, BackupId, DuplicateDetector, Launchers,
-        OperationStepDecision, ScanKind, SteamShortcuts, TitleFinder, TitleQuery,
+        BackupId, DuplicateDetector, Launchers, OperationStepDecision, ScanKind, SteamShortcuts, TitleFinder,
+        TitleQuery, layout::BackupLayout, prepare_backup_target, scan_game_for_backup,
     },
     wrap,
 };
@@ -253,7 +253,9 @@ pub fn run(sub: Subcommand, no_manifest_update: bool, try_manifest_update: bool)
                                         Finality::Final,
                                         if games_specified { &games } else { &[] },
                                     ) {
-                                        log::error!("Failed to resolve save conflict pre-backup with direction {direction:?}: {e:?}");
+                                        log::error!(
+                                            "Failed to resolve save conflict pre-backup with direction {direction:?}: {e:?}"
+                                        );
                                         ui::alert(
                                             &games,
                                             gui,
@@ -540,7 +542,9 @@ pub fn run(sub: Subcommand, no_manifest_update: bool, try_manifest_update: bool)
                                         Finality::Final,
                                         if games_specified { &games } else { &[] },
                                     ) {
-                                        log::error!("Failed to resolve save conflict pre-restore with direction {direction:?}: {e:?}");
+                                        log::error!(
+                                            "Failed to resolve save conflict pre-restore with direction {direction:?}: {e:?}"
+                                        );
                                         ui::alert(
                                             &games,
                                             gui,
@@ -580,20 +584,19 @@ pub fn run(sub: Subcommand, no_manifest_update: bool, try_manifest_update: bool)
                     OperationStepDecision::Processed
                 };
 
-                if let Some(backup) = &backup {
-                    if let Some(BackupId::Named(scanned_backup)) = scan_info.backup.as_ref().map(|x| x.id()) {
-                        if backup != &scanned_backup {
-                            log::trace!("step {i} completed (backup mismatch)");
-                            let display_title = config.display_name(name);
-                            return Some((
-                                display_title,
-                                scan_info,
-                                Default::default(),
-                                decision,
-                                Some(Err(Error::CliInvalidBackupId)),
-                            ));
-                        }
-                    }
+                if let Some(backup) = &backup
+                    && let Some(BackupId::Named(scanned_backup)) = scan_info.backup.as_ref().map(|x| x.id())
+                    && backup != &scanned_backup
+                {
+                    log::trace!("step {i} completed (backup mismatch)");
+                    let display_title = config.display_name(name);
+                    return Some((
+                        display_title,
+                        scan_info,
+                        Default::default(),
+                        decision,
+                        Some(Err(Error::CliInvalidBackupId)),
+                    ));
                 }
 
                 let restore_info = if scan_info.backup.is_none() || preview || ignored {
@@ -1313,11 +1316,7 @@ pub fn run(sub: Subcommand, no_manifest_update: bool, try_manifest_update: bool)
             unreachable!("`gui` command must be handled in main");
         }
     }
-    if failed {
-        Err(Error::SomeEntriesFailed)
-    } else {
-        Ok(())
-    }
+    if failed { Err(Error::SomeEntriesFailed) } else { Ok(()) }
 }
 
 fn configure_cloud(config: &mut Config, remote: Remote) -> Result<(), Error> {

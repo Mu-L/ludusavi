@@ -10,12 +10,12 @@ use crate::{
     cloud::Remote,
     lang::{Language, TRANSLATOR},
     path::CommonPath,
-    prelude::{app_dir, EditAction, Error, RedirectEditActionField, Security, StrictPath, AVAILABLE_PARALELLISM},
+    prelude::{AVAILABLE_PARALELLISM, EditAction, Error, RedirectEditActionField, Security, StrictPath, app_dir},
     resource::{
-        manifest::{self, CloudMetadata, Manifest, Store},
         ResourceFile, SaveableResourceFile,
+        manifest::{self, CloudMetadata, Manifest, Store},
     },
-    scan::{registry::RegistryItem, ScanKind},
+    scan::{ScanKind, registry::RegistryItem},
 };
 
 pub const MANIFEST_URL: &str =
@@ -1581,10 +1581,11 @@ impl Config {
             });
 
             for root in &self.roots {
-                if let Root::Lutris(stored) = root {
-                    if stored.path.equivalent(&path) && (stored.database.is_some() || database.is_none()) {
-                        continue 'lutris;
-                    }
+                if let Root::Lutris(stored) = root
+                    && stored.path.equivalent(&path)
+                    && (stored.database.is_some() || database.is_none())
+                {
+                    continue 'lutris;
                 }
             }
 
@@ -1917,10 +1918,10 @@ impl ToggledRegistry {
         if !self.0.contains_key(game) {
             return;
         }
-        if let Some(entry) = self.0.get_mut(game) {
-            if entry.get(path) == Some(&ToggledRegistryEntry::Unset) {
-                entry.remove(path);
-            }
+        if let Some(entry) = self.0.get_mut(game)
+            && entry.get(path) == Some(&ToggledRegistryEntry::Unset)
+        {
+            entry.remove(path);
         }
         if self.0[game].is_empty() {
             self.0.remove(game);
@@ -1992,10 +1993,10 @@ impl ToggledRegistry {
                 self.0.get_mut(game).map(|entry| entry.remove(path));
             }
         }
-        if let Some(entry) = self.0.get_mut(game) {
-            if entry.get(path) == Some(&ToggledRegistryEntry::Unset) {
-                entry.remove(path);
-            }
+        if let Some(entry) = self.0.get_mut(game)
+            && entry.get(path) == Some(&ToggledRegistryEntry::Unset)
+        {
+            entry.remove(path);
         }
         if self.0[game].is_empty() {
             self.0.remove(game);

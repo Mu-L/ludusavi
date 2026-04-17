@@ -8,10 +8,10 @@ use iced::Length;
 use crate::{
     cloud::Remote,
     gui::{
-        common::{Message, UndoSubject, ERROR_ICON},
+        common::{ERROR_ICON, Message, UndoSubject},
         modal::{ModalField, ModalInputKind},
         style,
-        widget::{id, Element, TextInput, Undoable},
+        widget::{Element, TextInput, Undoable, id},
     },
     lang::TRANSLATOR,
     prelude::{EditAction, RedirectEditActionField, StrictPath},

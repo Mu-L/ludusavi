@@ -1,11 +1,14 @@
-use std::sync::{Arc, LazyLock, Mutex};
+use std::{
+    borrow::Cow,
+    sync::{Arc, LazyLock, Mutex},
+};
 
 use filetime::FileTime;
 use itertools::Itertools;
 
 use crate::{
     prelude::{AnyError, SKIP},
-    resource::manifest::{placeholder, Os},
+    resource::manifest::{Os, placeholder},
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -300,17 +303,17 @@ impl StrictPath {
                     }
                 }
                 Component::Unix(UComponent::CurDir) | Component::Windows(WComponent::CurDir) => {
-                    if i == 0 {
-                        if let Some(basis) = &self.basis {
-                            analysis = Self::new(basis.clone()).analyze_with_mode(mode);
-                        }
+                    if i == 0
+                        && let Some(basis) = &self.basis
+                    {
+                        analysis = Self::new(basis.clone()).analyze_with_mode(mode);
                     }
                 }
                 Component::Unix(UComponent::ParentDir) | Component::Windows(WComponent::ParentDir) => {
-                    if i == 0 {
-                        if let Some(basis) = &self.basis {
-                            analysis = Self::new(basis.clone()).analyze_with_mode(mode);
-                        }
+                    if i == 0
+                        && let Some(basis) = &self.basis
+                    {
+                        analysis = Self::new(basis.clone()).analyze_with_mode(mode);
                     }
                     analysis.parts.pop();
                 }
@@ -670,7 +673,7 @@ impl StrictPath {
         }
 
         let mut tail = vec![];
-        for pair in us.parts.into_iter().zip_longest(find.parts.into_iter()) {
+        for pair in us.parts.into_iter().zip_longest(find.parts) {
             match pair {
                 itertools::EitherOrBoth::Both(old, find) => {
                     if old != find {
@@ -718,8 +721,8 @@ impl StrictPath {
     #[cfg(target_os = "windows")]
     pub fn copy_to(&self, target: &StrictPath) -> std::io::Result<u64> {
         use windows::{
-            core::PCWSTR,
             Win32::{Foundation::HANDLE, Storage::FileSystem::*},
+            core::PCWSTR,
         };
 
         fn prepare_verbatim_path(path: &StrictPath) -> Result<Vec<u16>, std::io::Error> {
@@ -756,7 +759,9 @@ impl StrictPath {
             lpdata: *const core::ffi::c_void,
         ) -> COPYPROGRESSROUTINE_PROGRESS {
             if dwstreamnumber == 1 {
-                *(lpdata as *mut i64) = streambytestransferred;
+                unsafe {
+                    *(lpdata as *mut i64) = streambytestransferred;
+                }
             }
             PROGRESS_CONTINUE
         }
@@ -1213,16 +1218,12 @@ impl<'de> serde::Deserialize<'de> for StrictPath {
 }
 
 impl schemars::JsonSchema for StrictPath {
-    fn schema_name() -> String {
-        "FilePath".to_string()
+    fn schema_name() -> Cow<'static, str> {
+        Cow::Borrowed("FilePath")
     }
 
-    fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        String::json_schema(gen)
-    }
-
-    fn is_referenceable() -> bool {
-        true
+    fn json_schema(generator: &mut schemars::generate::SchemaGenerator) -> schemars::Schema {
+        String::json_schema(generator)
     }
 }
 
@@ -1322,29 +1323,37 @@ mod tests {
 
         #[test]
         fn checks_if_files_are_identical() {
-            assert!(StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo()))
-                .same_content(&StrictPath::new(format!("{}/tests/root2/game2/file1.txt", repo()))));
+            assert!(
+                StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo()))
+                    .same_content(&StrictPath::new(format!("{}/tests/root2/game2/file1.txt", repo())))
+            );
             assert!(
                 !StrictPath::new(format!("{}/tests/root1/game1/subdir/file2.txt", repo()))
                     .same_content(&StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo())))
             );
-            assert!(!StrictPath::new(format!("{}/tests/root1/game1/file1.txt", repo()))
-                .same_content(&StrictPath::new(format!("{}/nonexistent.txt", repo()))));
+            assert!(
+                !StrictPath::new(format!("{}/tests/root1/game1/file1.txt", repo()))
+                    .same_content(&StrictPath::new(format!("{}/nonexistent.txt", repo())))
+            );
         }
 
         #[test]
         fn tries_to_check_if_files_are_identical() {
-            assert!(StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo()))
-                .try_same_content(&StrictPath::new(format!("{}/tests/root2/game2/file1.txt", repo())))
-                .unwrap());
+            assert!(
+                StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo()))
+                    .try_same_content(&StrictPath::new(format!("{}/tests/root2/game2/file1.txt", repo())))
+                    .unwrap()
+            );
             assert!(
                 !StrictPath::new(format!("{}/tests/root1/game1/subdir/file2.txt", repo()))
                     .try_same_content(&StrictPath::new(format!("{}/tests/root2/game1/file1.txt", repo())))
                     .unwrap()
             );
-            assert!(StrictPath::new(format!("{}/tests/root1/game1/file1.txt", repo()))
-                .try_same_content(&StrictPath::new(format!("{}/nonexistent.txt", repo())))
-                .is_err());
+            assert!(
+                StrictPath::new(format!("{}/tests/root1/game1/file1.txt", repo()))
+                    .try_same_content(&StrictPath::new(format!("{}/nonexistent.txt", repo())))
+                    .is_err()
+            );
         }
 
         #[test]

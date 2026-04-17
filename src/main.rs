@@ -9,7 +9,7 @@ use ludusavi::{
     cloud,
     lang::{self, TRANSLATOR},
     metadata, path,
-    prelude::{self, app_dir, CONFIG_DIR, VERSION},
+    prelude::{self, CONFIG_DIR, VERSION, app_dir},
     report, resource, scan, wrap,
 };
 
@@ -148,35 +148,37 @@ fn prepare_winit() {
 /// if logging was enabled before detaching.
 #[cfg(target_os = "windows")]
 unsafe fn detach_console(debug: bool) {
-    use windows::Win32::{
-        Foundation::HANDLE,
-        System::Console::{FreeConsole, SetStdHandle, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE},
-    };
+    unsafe {
+        use windows::Win32::{
+            Foundation::HANDLE,
+            System::Console::{FreeConsole, STD_ERROR_HANDLE, STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, SetStdHandle},
+        };
 
-    fn tell(msg: &str) {
-        eprintln!("{msg}");
-        log::error!("{}", msg);
-    }
+        fn tell(msg: &str) {
+            eprintln!("{msg}");
+            log::error!("{}", msg);
+        }
 
-    if FreeConsole().is_err() {
-        tell("Unable to detach the console");
-        debug_on_exit(debug);
-        std::process::exit(1);
-    }
-    if SetStdHandle(STD_INPUT_HANDLE, HANDLE::default()).is_err() {
-        tell("Unable to reset stdin handle");
-        debug_on_exit(debug);
-        std::process::exit(1);
-    }
-    if SetStdHandle(STD_OUTPUT_HANDLE, HANDLE::default()).is_err() {
-        tell("Unable to reset stdout handle");
-        debug_on_exit(debug);
-        std::process::exit(1);
-    }
-    if SetStdHandle(STD_ERROR_HANDLE, HANDLE::default()).is_err() {
-        tell("Unable to reset stderr handle");
-        debug_on_exit(debug);
-        std::process::exit(1);
+        if FreeConsole().is_err() {
+            tell("Unable to detach the console");
+            debug_on_exit(debug);
+            std::process::exit(1);
+        }
+        if SetStdHandle(STD_INPUT_HANDLE, HANDLE::default()).is_err() {
+            tell("Unable to reset stdin handle");
+            debug_on_exit(debug);
+            std::process::exit(1);
+        }
+        if SetStdHandle(STD_OUTPUT_HANDLE, HANDLE::default()).is_err() {
+            tell("Unable to reset stdout handle");
+            debug_on_exit(debug);
+            std::process::exit(1);
+        }
+        if SetStdHandle(STD_ERROR_HANDLE, HANDLE::default()).is_err() {
+            tell("Unable to reset stderr handle");
+            debug_on_exit(debug);
+            std::process::exit(1);
+        }
     }
 }
 

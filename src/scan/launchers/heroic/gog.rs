@@ -6,8 +6,8 @@ use crate::{
     prelude::ENV_DEBUG,
     resource::{config::root, manifest::Os},
     scan::{
-        launchers::{heroic::find_prefix, LauncherGame},
         TitleFinder, TitleQuery,
+        launchers::{LauncherGame, heroic::find_prefix},
     },
 };
 
@@ -143,8 +143,8 @@ mod tests {
     use super::*;
     use crate::{
         resource::{
-            manifest::{Manifest, Os},
             ResourceFile,
+            manifest::{Manifest, Os},
         },
         testing::repo,
     };

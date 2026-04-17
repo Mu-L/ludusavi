@@ -86,20 +86,16 @@ impl Hives {
     }
 
     fn load_raw(file: &StrictPath) -> Option<String> {
-        if file.is_file() {
-            file.read()
-        } else {
-            None
-        }
+        if file.is_file() { file.read() } else { None }
     }
 
     pub fn save(&self, file: &StrictPath) {
         let new_content = self.serialize(Format::Reg);
 
-        if let Some(old_content) = Self::load_raw(file) {
-            if old_content == new_content {
-                return;
-            }
+        if let Some(old_content) = Self::load_raw(file)
+            && old_content == new_content
+        {
+            return;
         }
 
         if file.create_parent_dir().is_ok() {

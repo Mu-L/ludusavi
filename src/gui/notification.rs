@@ -4,7 +4,7 @@ use iced::{alignment, padding};
 
 use crate::gui::{
     style,
-    widget::{text, Container},
+    widget::{Container, text},
 };
 
 pub struct Notification {

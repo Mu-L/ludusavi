@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    prelude::{StrictPath, ENV_DEBUG},
+    prelude::{ENV_DEBUG, StrictPath},
     resource::{config::root, manifest::Os},
-    scan::{launchers::LauncherGame, TitleFinder},
+    scan::{TitleFinder, launchers::LauncherGame},
 };
 
 pub mod installed {
@@ -86,7 +86,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        resource::{manifest::Manifest, ResourceFile},
+        resource::{ResourceFile, manifest::Manifest},
         testing::repo,
     };
 

@@ -1,6 +1,6 @@
 use std::ops::RangeInclusive;
 
-use iced::{widget as w, Alignment, Length};
+use iced::{Alignment, Length, widget as w};
 
 use crate::{
     gui::{
@@ -324,11 +324,7 @@ impl<'a> IcedParentExt<'a> for Column<'a> {
     where
         E: Into<Element<'a>>,
     {
-        if condition {
-            self.push(element().into())
-        } else {
-            self
-        }
+        if condition { self.push(element().into()) } else { self }
     }
 }
 
@@ -337,11 +333,7 @@ impl<'a> IcedParentExt<'a> for Row<'a> {
     where
         E: Into<Element<'a>>,
     {
-        if condition {
-            self.push(element().into())
-        } else {
-            self
-        }
+        if condition { self.push(element().into()) } else { self }
     }
 }
 
@@ -351,23 +343,18 @@ pub trait IcedButtonExt<'a> {
 
 impl<'a> IcedButtonExt<'a> for Button<'a> {
     fn on_press_if(self, condition: bool, msg: impl FnOnce() -> Message) -> Self {
-        if condition {
-            self.on_press(msg())
-        } else {
-            self
-        }
+        if condition { self.on_press(msg()) } else { self }
     }
 }
 
 pub mod operation {
     use iced::{
-        advanced::widget::{
-            operate,
-            operation::{Outcome, Scrollable},
-            Operation,
-        },
-        widget::{scrollable::AbsoluteOffset, Id},
         Rectangle, Task, Vector,
+        advanced::widget::{
+            Operation, operate,
+            operation::{Outcome, Scrollable},
+        },
+        widget::{Id, scrollable::AbsoluteOffset},
     };
 
     pub fn container_scroll_offset(id: Id) -> Task<Option<AbsoluteOffset>> {

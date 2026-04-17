@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     lang::TRANSLATOR,
     path::StrictPath,
-    scan::{registry::RegistryItem, ScanChange, ScanChangeCount, ScanInfo},
+    scan::{ScanChange, ScanChangeCount, ScanInfo, registry::RegistryItem},
 };
 
 #[derive(Clone, Debug)]

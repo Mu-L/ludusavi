@@ -1,7 +1,6 @@
 use iced::{
-    keyboard, padding,
-    widget::{space, tooltip, Space},
-    Alignment, Length,
+    Alignment, Length, keyboard, padding,
+    widget::{Space, space, tooltip},
 };
 
 use crate::{
@@ -13,7 +12,7 @@ use crate::{
         search::CustomGamesFilter,
         shortcuts::TextHistories,
         style,
-        widget::{checkbox, pick_list, text, Column, Container, IcedParentExt, Row, Tooltip},
+        widget::{Column, Container, IcedParentExt, Row, Tooltip, checkbox, pick_list, text},
     },
     lang::TRANSLATOR,
     resource::{
